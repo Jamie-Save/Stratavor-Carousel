@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stratavor Hero Carousel</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      background: #000;
+      color: #fff;
+    }
+    .swiper {
+      width: 100%;
+      height: 100vh;
+    }
+    .swiper-slide {
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .slide-content {
+      background: rgba(0, 0, 0, 0.55);
+      padding: 2rem;
+      border-radius: 8px;
+      max-width: 90%;
+    }
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+    }
+    p {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .cta-button {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background: #00acc1;
+      color: white;
+      text-decoration: none;
+      border-radius: 999px;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+    .cta-button:hover {
+      background: #0097a7;
+    }
+  </style>
+</head>
+<body>
+  <div class="swiper">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide" style="background-image: url('https://source.unsplash.com/1920x1080/?chess');">
+        <div class="slide-content">
+          <h1>Empowering Financial Insight</h1>
+          <p>Discover how we drive growth with clarity and confidence.</p>
+          <a href="#" class="cta-button">Get the Snapshot</a>
+        </div>
+      </div>
+      <div class="swiper-slide" style="background-image: url('https://source.unsplash.com/1920x1080/?finance');">
+        <div class="slide-content">
+          <h1>Strategic Clarity</h1>
+          <p>We don’t just show the data — we decode it.</p>
+          <a href="#" class="cta-button">See How</a>
+        </div>
+      </div>
+      <div class="swiper-slide" style="background-image: url('https://source.unsplash.com/1920x1080/?growth');">
+        <div class="slide-content">
+          <h1>Growth-Ready Strategies</h1>
+          <p>From insights to action in one clear report.</p>
+          <a href="#" class="cta-button">Start Here</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+  <script>
+    const swiper = new Swiper(".swiper", {
+      autoplay: {
+        delay: 4000,
+        disableOnInteraction: false,
+      },
+      loop: true,
+    });
+  </script>
+</body>
+</html>
