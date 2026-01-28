@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stratavor — Premium Report Carousel</title>
+
+  <!-- Swiper (bundle includes thumbs, a11y, autoplay, etc.) -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+
+  <style>
+    :root{
+      --sv-gunmetal: #395460;
+      --sv-gunmetal-2: #2A3F48;
+      --sv-ink: #0B1220;
+      --sv-mist: #D1D4D6;
+      --sv-white: #ffffff;
+
+      --sv-accent: #00ACC1;
+      --sv-accent-2: #2dd4bf;
+
+      --sv-bg: #05070B;
+      --sv-bg-2: #050910;
+
+      --sv-radius-xl: 28px;
+      --sv-radius-lg: 22px;
+      --sv-radius-md: 16px;
+      --sv-radius-sm: 12px;
+
+      --sv-shadow-1: 0 18px 70px rgba(0,0,0,.55);
+      --sv-shadow-2: 0 34px 120px rgba(57,84,96,.22);
+
+      --sv-maxw: 1180px;
+
+      /* iframe-friendly: cap hero height to avoid inner scrollbars */
+      --sv-hero-h: min(86svh, 760px);
+    }
+
+    *{ box-sizing: border-box; }
+    html, body{
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: var(--sv-bg);
+      color: #fff;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+
+    /* ---------- Premium backdrop ---------- */
+    .sv-wrap{
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      padding: clamp(18px, 3.2vw, 40px) clamp(14px, 2.2vw, 28px);
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(1200px 700px at 50% 22%, rgba(57,84,96,.22), transparent 58%),
+        radial-gradient(900px 620px at 12% 38%, rgba(0,172,193,.14), transparent 62%),
+        radial-gradient(980px 760px at 88% 68%, rgba(45,212,191,.12), transparent 66%),
+        linear-gradient(180deg, rgba(5,7,11,1) 0%, rgba(5,9,16,1) 100%);
+    }
+
+    /* subtle noise layer (tiny inline SVG) */
+    .sv-wrap::before{
+      content:"";
+      position:absolute;
+      inset:-60px;
+      pointer-events:none;
+      opacity:.05;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+
+    .sv-shell{
+      width: min(var(--sv-maxw), 100%);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ---------- Header copy ---------- */
+    .sv-top{
+      text-align: center;
+      margin-bottom: clamp(14px, 2vw, 18px);
+    }
+    .sv-eyebrow{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.04);
+      color: rgba(255,255,255,.78);
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-size: 11px;
+    }
+    .sv-dot{
+      width: 7px; height: 7px; border-radius: 99px;
+      background: linear-gradient(135deg, var(--sv-accent), var(--sv-accent-2));
+      box-shadow: 0 0 0 4px rgba(0,172,193,.16);
+    }
+
+    .sv-h1{
+      margin: 14px 0 10px;
+      font-size: clamp(34px, 3.8vw, 58px);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      font-weight: 750;
+    }
+    .sv-lede{
+      margin: 0 auto;
+      max-width: 72ch;
+      color: rgba(255,255,255,.78);
+      font-size: clamp(14px, 1.3vw, 16px);
+      line-height: 1.65;
+    }
+
+    /* ---------- Device shell ---------- */
+    .sv-device{
+      margin: clamp(14px, 2vw, 18px) auto 0;
+      height: var(--sv-hero-h);
+      border-radius: var(--sv-radius-xl);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--sv-shadow-1), var(--sv-shadow-2), inset 0 0 0 1px rgba(255,255,255,.06);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* top chrome */
+    .sv-chrome{
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+    }
+    .sv-chrome-left{
+      display:flex; gap:8px; align-items:center;
+    }
+    .sv-pill{
+      width: 10px; height: 10px; border-radius: 99px;
+      background: rgba(255,255,255,.18);
+    }
+    .sv-chrome-right{
+      display:flex; gap:10px; align-items:center;
+      color: rgba(255,255,255,.62);
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .sv-live{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,172,193,.10);
+      color: rgba(255,255,255,.88);
+    }
+
+    /* progress bar */
+    .sv-progress{
+      position:absolute;
+      left: 0; right: 0;
+      top: 44px;
+      height: 2px;
+      background: rgba(255,255,255,.08);
+      z-index: 6;
+    }
+    .sv-progress > i{
+      display:block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--sv-accent), var(--sv-accent-2));
+      box-shadow: 0 0 18px rgba(0,172,193,.45);
+      transition: width 80ms linear;
+    }
+
+    /* ---------- Main stage (swiper) ---------- */
+    .sv-stage{
+      height: calc(var(--sv-hero-h) - 44px);
+      position: relative;
+      padding: 18px;
+    }
+
+    .sv-main.swiper{
+      height: 100%;
+      border-radius: calc(var(--sv-radius-xl) - 10px);
+      overflow: hidden;
+    }
+
+    /* white report paper backing */
+    .sv-slide-inner{
+      height: 100%;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background:
+        radial-gradient(800px 420px at 50% 0%, rgba(255,255,255,.10), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    }
+
+    .sv-report{
+      width: min(1060px, 100%);
+      height: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(0,0,0,.10);
+      background: #fff;
+      box-shadow:
+        0 26px 90px rgba(0,0,0,.30),
+        0 10px 30px rgba(57,84,96,.18);
+      overflow: hidden;
+      position: relative;
+      display: grid;
+      place-items: center;
+    }
+
+    .sv-report img{
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* IMPORTANT for landscape reports */
+      background: #fff;
+      display: block;
+      transform: translateZ(0);
+    }
+
+    /* subtle zoom affordance */
+    .sv-zoom-hint{
+      position:absolute;
+      right: 14px;
+      bottom: 14px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.88);
+      color: rgba(11,18,32,.82);
+      font-size: 12px;
+      font-weight: 650;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      user-select: none;
+    }
+    .sv-zoom-hint svg{ width: 16px; height: 16px; }
+
+    /* caption chip */
+    .sv-caption{
+      position:absolute;
+      left: 14px;
+      bottom: 14px;
+      max-width: min(560px, calc(100% - 170px));
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(11,18,32,.42);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 18px 60px rgba(0,0,0,.28);
+      color: #fff;
+    }
+    .sv-cap-title{
+      font-weight: 750;
+      letter-spacing: -0.01em;
+      font-size: 14px;
+      margin: 0 0 6px;
+    }
+    .sv-cap-copy{
+      margin: 0;
+      font-size: 12.5px;
+      line-height: 1.45;
+      color: rgba(255,255,255,.86);
+    }
+
+    /* ---------- Controls ---------- */
+    .sv-nav{
+      position:absolute;
+      inset: 0;
+      pointer-events:none;
+      z-index: 5;
+    }
+    .sv-btnnav{
+      pointer-events:auto;
+      position:absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 18px 70px rgba(0,0,0,.25);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+    }
+    .sv-btnnav:hover{ background: rgba(255,255,255,.10); }
+    .sv-btnnav:active{ transform: translateY(-50%) scale(.98); }
+    .sv-btnnav svg{ width: 18px; height: 18px; color:#fff; }
+    .sv-prev{ left: 14px; }
+    .sv-next{ right: 14px; }
+
+    /* Swiper hooks */
+    .sv-main .swiper-pagination{
+      bottom: 14px !important;
+    }
+    .sv-main .swiper-pagination-bullet{
+      width: 7px; height: 7px;
+      background: rgba(255,255,255,.30);
+      opacity: 1;
+      transition: width .22s ease, background .22s ease, transform .22s ease;
+    }
+    .sv-main .swiper-pagination-bullet-active{
+      width: 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.88);
+    }
+
+    /* ---------- Thumbnails filmstrip ---------- */
+    .sv-thumbs-wrap{
+      margin-top: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .sv-thumbs-label{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      color: rgba(255,255,255,.62);
+      font-size: 12px;
+      font-weight: 650;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 0 6px;
+    }
+
+    .sv-thumbs.swiper{
+      width: 100%;
+      padding: 6px 0;
+    }
+
+    .sv-thumbs .swiper-slide{
+      height: 74px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      opacity: .72;
+      cursor: pointer;
+      transform: translateZ(0);
+      transition: transform .18s ease, opacity .18s ease, border-color .18s ease;
+    }
+    .sv-thumbs .swiper-slide-thumb-active{
+      opacity: 1;
+      transform: translateY(-2px);
+      border-color: rgba(0,172,193,.45);
+      box-shadow: 0 18px 70px rgba(0,0,0,.25);
+    }
+    .sv-thumb-inner{
+      display:grid;
+      grid-template-columns: 86px 1fr;
+      height: 100%;
+    }
+    .sv-thumb-img{
+      background: #fff;
+      display:grid;
+      place-items:center;
+      border-right: 1px solid rgba(0,0,0,.08);
+    }
+    .sv-thumb-img img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display:block;
+    }
+    .sv-thumb-meta{
+      padding: 10px 12px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap: 4px;
+    }
+    .sv-thumb-title{
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: -0.01em;
+      color: rgba(255,255,255,.92);
+      line-height: 1.15;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sv-thumb-sub{
+      font-size: 12px;
+      color: rgba(255,255,255,.68);
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ---------- CTAs ---------- */
+    .sv-actions{
+      margin-top: 16px;
+      display:flex;
+      justify-content:center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .sv-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding: 13px 18px;
+      border-radius: 999px;
+      text-decoration:none;
+      font-weight: 750;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.92);
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease, border-color .18s ease;
+      box-shadow: 0 18px 70px rgba(0,0,0,.18);
+      user-select: none;
+    }
+    .sv-btn:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.10);
+      border-color: rgba(255,255,255,.22);
+    }
+    .sv-btn--primary{
+      background: linear-gradient(135deg, rgba(0,172,193,.90), rgba(45,212,191,.88));
+      border-color: rgba(0,172,193,.45);
+      color: #071018;
+      box-shadow: 0 22px 85px rgba(0,172,193,.22);
+    }
+    .sv-btn--primary:hover{
+      background: linear-gradient(135deg, rgba(0,172,193,1), rgba(45,212,191,1));
+      border-color: rgba(0,172,193,.62);
+    }
+    .sv-btn svg{ width: 18px; height: 18px; }
+
+    /* ---------- Modal (zoom) ---------- */
+    .sv-modal{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.78);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      z-index: 9999;
+    }
+    .sv-modal.is-open{ display:flex; }
+
+    .sv-modal-card{
+      width: min(1200px, 100%);
+      height: min(86svh, 860px);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(11,18,32,.65);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 30px 140px rgba(0,0,0,.6);
+      overflow:hidden;
+      position: relative;
+      display:flex;
+      flex-direction:column;
+    }
+    .sv-modal-top{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.86);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .sv-modal-actions{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+    .sv-iconbtn{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.92);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-weight: 750;
+      cursor:pointer;
+      text-decoration:none;
+    }
+    .sv-iconbtn:hover{ background: rgba(255,255,255,.10); }
+
+    .sv-modal-body{
+      flex:1;
+      background: #fff;
+      display:grid;
+      place-items:center;
+      overflow: auto;
+    }
+    .sv-modal-body img{
+      width: 100%;
+      height: auto;
+      max-width: none;
+      display:block;
+    }
+
+    /* ---------- Responsive tweaks ---------- */
+    @media (max-width: 860px){
+      .sv-stage{ padding: 12px; }
+      .sv-btnnav{ width: 42px; height: 42px; }
+      .sv-prev{ left: 10px; }
+      .sv-next{ right: 10px; }
+      .sv-thumb-inner{ grid-template-columns: 74px 1fr; }
+    }
+    @media (max-width: 520px){
+      :root{ --sv-hero-h: min(78svh, 660px); }
+      .sv-caption{ max-width: calc(100% - 20px); }
+      .sv-zoom-hint{ display:none; }
+      .sv-actions{ flex-direction: column; align-items: stretch; }
+      .sv-btn{ width: 100%; }
+    }
+
+    /* Reduce motion */
+    @media (prefers-reduced-motion: reduce){
+      *{ scroll-behavior: auto !important; }
+      .sv-btn, .sv-thumbs .swiper-slide{ transition: none !important; }
+      .sv-progress > i{ transition: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="sv-wrap">
+    <section class="sv-shell" aria-label="Stratavor premium report carousel">
+      <header class="sv-top">
+        <div class="sv-eyebrow"><span class="sv-dot" aria-hidden="true"></span> Narrative Intelligence</div>
+        <h1 class="sv-h1">Board-ready reporting, on autopilot.</h1>
+        <p class="sv-lede">Swipe through live report pages your exec team actually reads — clean visuals, clear commentary, and a path to the next decision.</p>
+      </header>
+
+      <div class="sv-device" id="svDevice">
+        <div class="sv-chrome" aria-hidden="true">
+          <div class="sv-chrome-left">
+            <span class="sv-pill"></span><span class="sv-pill"></span><span class="sv-pill"></span>
+          </div>
+          <div class="sv-chrome-right">
+            <span class="sv-live">Auto-refresh</span>
+            <span id="svSlideLabel">1 / 3</span>
+          </div>
+        </div>
+
+        <div class="sv-progress" aria-hidden="true"><i id="svProgressBar"></i></div>
+
+        <div class="sv-stage">
+          <!-- Main carousel -->
+          <div class="swiper sv-main" id="svMain">
+            <div class="swiper-wrapper">
+
+              <!-- Slide 1 -->
+              <div class="swiper-slide">
+                <div class="sv-slide-inner">
+                  <figure class="sv-report" data-title="Financial Snapshot" data-copy="A leadership-ready view of performance and position — generated automatically.">
+                    <img loading="eager" decoding="async"
+                      src="https://49216937.fs1.hubspotusercontent-eu1.net/hubfs/49216937/Financial_Snpshot_Carousel%5B1%5D.png"
+                      alt="Financial Snapshot report page" />
+                    <figcaption class="sv-caption">
+                      <div class="sv-cap-title">Financial Snapshot</div>
+                      <p class="sv-cap-copy">A leadership-ready view of performance and position — generated automatically.</p>
+                    </figcaption>
+                    <div class="sv-zoom-hint" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none"><path d="M10.5 3a7.5 7.5 0 105.06 13.03l3.7 3.7a1 1 0 001.42-1.42l-3.7-3.7A7.5 7.5 0 0010.5 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10.5 7v7M7 10.5h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                      Click to zoom
+                    </div>
+                  </figure>
+                </div>
+              </div>
+
+              <!-- Slide 2 -->
+              <div class="swiper-slide">
+                <div class="sv-slide-inner">
+                  <figure class="sv-report" data-title="Numbers That Matter" data-copy="Key indicators, surfaced without noise — built for monthly reviews.">
+                    <img loading="lazy" decoding="async"
+                      src="https://49216937.fs1.hubspotusercontent-eu1.net/hubfs/49216937/Numbers_That_Matter%5B1%5D.png"
+                      alt="Numbers That Matter report page" />
+                    <figcaption class="sv-caption">
+                      <div class="sv-cap-title">Numbers That Matter</div>
+                      <p class="sv-cap-copy">Key indicators, surfaced without noise — built for monthly reviews.</p>
+                    </figcaption>
+                    <div class="sv-zoom-hint" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none"><path d="M10.5 3a7.5 7.5 0 105.06 13.03l3.7 3.7a1 1 0 001.42-1.42l-3.7-3.7A7.5 7.5 0 0010.5 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10.5 7v7M7 10.5h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                      Click to zoom
+                    </div>
+                  </figure>
+                </div>
+              </div>
+
+              <!-- Slide 3 -->
+              <div class="swiper-slide">
+                <div class="sv-slide-inner">
+                  <figure class="sv-report" data-title="Customer Retention" data-copy="LTV, CAC, and retention health — with commentary that drives action.">
+                    <img loading="lazy" decoding="async"
+                      src="https://49216937.fs1.hubspotusercontent-eu1.net/hubfs/49216937/Customer%20Retention%20-%20LTV%2c%20CAC.png"
+                      alt="Customer retention report page showing LTV and CAC" />
+                    <figcaption class="sv-caption">
+                      <div class="sv-cap-title">Customer Retention</div>
+                      <p class="sv-cap-copy">LTV, CAC, and retention health — with commentary that drives action.</p>
+                    </figcaption>
+                    <div class="sv-zoom-hint" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none"><path d="M10.5 3a7.5 7.5 0 105.06 13.03l3.7 3.7a1 1 0 001.42-1.42l-3.7-3.7A7.5 7.5 0 0010.5 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10.5 7v7M7 10.5h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                      Click to zoom
+                    </div>
+                  </figure>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- pagination dots -->
+            <div class="swiper-pagination" aria-label="Carousel pagination"></div>
+
+            <!-- custom nav -->
+            <div class="sv-nav" aria-hidden="true">
+              <button class="sv-btnnav sv-prev" type="button" aria-label="Previous slide">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button class="sv-btnnav sv-next" type="button" aria-label="Next slide">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Thumbnails -->
+      <div class="sv-thumbs-wrap">
+        <div class="sv-thumbs-label">
+          <span>Explore pages</span>
+          <span>Drag • Swipe • Click</span>
+        </div>
+
+        <div class="swiper sv-thumbs" id="svThumbs" aria-label="Carousel thumbnails">
+          <div class="swiper-wrapper">
+
+            <div class="swiper-slide">
+              <div class="sv-thumb-inner">
+                <div class="sv-thumb-img">
+                  <img loading="lazy" decoding="async"
+                    src="https://49216937.fs1.hubspotusercontent-eu1.net/hubfs/49216937/Financial_Snpshot_Carousel%5B1%5D.png"
+                    alt="" />
+                </div>
+                <div class="sv-thumb-meta">
+                  <p class="sv-thumb-title">Financial Snapshot</p>
+                  <p class="sv-thumb-sub">Performance & position</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="swiper-slide">
+              <div class="sv-thumb-inner">
+                <div class="sv-thumb-img">
+                  <img loading="lazy" decoding="async"
+                    src="https://49216937.fs1.hubspotusercontent-eu1.net/hubfs/49216937/Numbers_That_Matter%5B1%5D.png"
+                    alt="" />
+                </div>
+                <div class="sv-thumb-meta">
+                  <p class="sv-thumb-title">Numbers That Matter</p>
+                  <p class="sv-thumb-sub">KPIs without noise</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="swiper-slide">
+              <div class="sv-thumb-inner">
+                <div class="sv-thumb-img">
+                  <img loading="lazy" decoding="async"
+                    src="https://49216937.fs1.hubspotusercontent-eu1.net/hubfs/49216937/Customer%20Retention%20-%20LTV%2c%20CAC.png"
+                    alt="" />
+                </div>
+                <div class="sv-thumb-meta">
+                  <p class="sv-thumb-title">Customer Retention</p>
+                  <p class="sv-thumb-sub">LTV, CAC, retention</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- CTAs -->
+      <div class="sv-actions" aria-label="Primary actions">
+        <a class="sv-btn sv-btn--primary" href="https://stratavor.com/product" target="_top" rel="noopener">
+          See pricing
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="sv-btn" href="https://stratavor.com/Power-BI" target="_top" rel="noopener">
+          View a live sample
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Zoom modal -->
+  <div class="sv-modal" id="svModal" aria-hidden="true" role="dialog" aria-label="Report zoom">
+    <div class="sv-modal-card" role="document">
+      <div class="sv-modal-top">
+        <span id="svModalTitle">Report</span>
+        <div class="sv-modal-actions">
+          <a class="sv-iconbtn" id="svOpenNew" href="#" target="_blank" rel="noopener">Open</a>
+          <button class="sv-iconbtn" id="svClose" type="button">Close</button>
+        </div>
+      </div>
+      <div class="sv-modal-body">
+        <img id="svModalImg" alt="Zoomed report" />
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+  <script>
+    (function(){
+      const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const progressBar = document.getElementById('svProgressBar');
+      const slideLabel = document.getElementById('svSlideLabel');
+
+      const thumbs = new Swiper('#svThumbs', {
+        slidesPerView: 3,
+        spaceBetween: 10,
+        watchSlidesProgress: true,
+        freeMode: true,
+        breakpoints: {
+          0: { slidesPerView: 1.25 },
+          520: { slidesPerView: 2.1 },
+          860: { slidesPerView: 3 }
+        }
+      });
+
+      const main = new Swiper('#svMain', {
+        loop: true,
+        effect: 'fade',
+        fadeEffect: { crossFade: true },
+        speed: 900,
+        autoplay: prefersReduced ? false : {
+          delay: 4200,
+          disableOnInteraction: false
+        },
+        pagination: {
+          el: '#svMain .swiper-pagination',
+          clickable: true
+        },
+        thumbs: { swiper: thumbs },
+        a11y: { enabled: true }
+      });
+
+      // Hook up custom nav buttons
+      document.querySelector('.sv-prev').addEventListener('click', () => main.slidePrev());
+      document.querySelector('.sv-next').addEventListener('click', () => main.slideNext());
+
+      // Pause autoplay on hover/focus for executive-friendly reading
+      const device = document.getElementById('svDevice');
+      const pause = () => { if (main.autoplay) main.autoplay.stop(); };
+      const resume = () => { if (main.autoplay) main.autoplay.start(); };
+      device.addEventListener('mouseenter', pause);
+      device.addEventListener('mouseleave', resume);
+      device.addEventListener('focusin', pause);
+      device.addEventListener('focusout', resume);
+
+      // Slide counter
+      function updateLabel(){
+        const realIndex = main.realIndex + 1;
+        const total = 3;
+        slideLabel.textContent = realIndex + ' / ' + total;
+      }
+      main.on('slideChange', updateLabel);
+      updateLabel();
+
+      // Autoplay progress bar (Swiper v10 emits autoplayTimeLeft)
+      if (!prefersReduced){
+        main.on('autoplayTimeLeft', (s, time, progress) => {
+          // progress goes 0 -> 1; we want bar fill 0% -> 100%
+          const pct = Math.max(0, Math.min(100, (1 - progress) * 100));
+          progressBar.style.width = pct.toFixed(2) + '%';
+        });
+      } else {
+        progressBar.style.width = '100%';
+      }
+
+      // Zoom modal (click report)
+      const modal = document.getElementById('svModal');
+      const modalImg = document.getElementById('svModalImg');
+      const modalTitle = document.getElementById('svModalTitle');
+      const openNew = document.getElementById('svOpenNew');
+      const closeBtn = document.getElementById('svClose');
+
+      function openModal(src, title){
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        modalImg.src = src;
+        modalTitle.textContent = title || 'Report';
+        openNew.href = src;
+        document.body.style.overflow = 'hidden';
+      }
+      function closeModal(){
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        modalImg.src = '';
+        document.body.style.overflow = '';
+      }
+
+      // Delegate click inside slides
+      document.getElementById('svMain').addEventListener('click', (e) => {
+        const report = e.target.closest('.sv-report');
+        if (!report) return;
+        const img = report.querySelector('img');
+        if (!img || !img.src) return;
+        openModal(img.src, report.getAttribute('data-title'));
+      });
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+      });
+      closeBtn.addEventListener('click', closeModal);
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+      });
+    })();
+  </script>
+</body>
+</html>
